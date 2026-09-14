@@ -24,7 +24,7 @@ API_HASH = '82aafe1590473bdbc558f60c46ed3387'
 BOT_TOKEN = '8817454197:AAGdII5VzjvJfBHG2gQ6n0j6G3v0xNTKnU0' 
 FILEMOON_API_KEY = '110|4mK5RhaO8YzMQb2aXgmcDuPqXTUgxdrzysgz6kP3' # यहाँ अपनी Filemoon API की डालें
 
-SOURCE_CHANNEL = -1001732832207  
+SOURCE_CHANNEL = -1004479525114  
 MY_CHANNEL = -1004442599529      
 
 client = TelegramClient('forwarder_session', API_ID, API_HASH).start()
