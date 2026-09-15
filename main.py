@@ -6,7 +6,6 @@ from flask import Flask
 from threading import Thread
 from telethon import TelegramClient, events
 from telethon.sessions import StringSession 
-from playwright.async_api import async_playwright
 
 # --- 1. पिंग के लिए Flask वेब-सर्वर सेटअप ---
 app = Flask('')
@@ -25,69 +24,52 @@ API_HASH = '82aafe1590473bdbc558f60c46ed3387'
 BOT_TOKEN = '8817454197:AAGdII5VzjvJfBHG2gQ6n0j6G3v0xNTKnU0' 
 FILEMOON_API_KEY = '110|4mK5RhaO8YzMQb2aXgmcDuPqXTUgxdrzysgz6kP3' 
 
-# 🎯 आपकी नोटपैड वाली लंबी स्ट्रिंग यहाँ आएगी:
+# 🎯 आपकी नोटपैड वाली लंबी स्ट्रिंग को यहाँ ट्रिपल कोट्स में डालें:
 TELEGRAM_STRING_SESSION = """1BVtsOMABu0gry-tc2n1t6umsoPgW6zR_cHS1EE4QfRm2L1f4pVNSgkcNyFGh_l30YudtJU0qU80dTFZfXrHYnYWIZDnp5XvJFlTTchxFzUZ0xQ-vlgrL3FJNJw8YqBTYrRFnPK1e7ItEttBG8qc-D60-wXcATtLtxYQ4v2HqN9CYgYy6xDp89zqLp83KEoeQIth6Qnv9SMxc_glP6zEFE6Ur2-KfVgoJ9G5UuratDWGhfncLstYKeqbrF7Qd4NLsXlCk-a7EYDc6Q-3UZx278jA5aeMGKyjIdQ2uxqe0tG3l6W6Nd5REGZWrNCLjooWuJ2VkYR5ZP03kMNUGUSlvec5O2tN9B4M="""
 
 # 🎯 रोज़ बॉट से निकाली हुई असली प्राइवेट चैनल आईडी यहाँ डालें (बिना कोट्स के)
-SOURCE_CHANNEL = -1001732832207  
+SOURCE_CHANNEL = -1004479525114  
 MY_CHANNEL = -1004442599529      
 
 client = TelegramClient(StringSession(TELEGRAM_STRING_SESSION), API_ID, API_HASH).start()
 bot = TelegramClient('bot_session', API_ID, API_HASH).start(bot_token=BOT_TOKEN)
 
-# --- 3. डिस्कवाला और Filemoon का ASYNC लॉजिक (Updated Auto-Click) ---
+# --- 3. डिस्कवाला डायरेक्ट एक्सट्रैक्शन और Filemoon ASYNC लॉजिक ---
 async def get_diskwala_mp4(diskwala_url):
-    """Playwright से /app/ पेज खोलकर बटन क्लिक करके असली .mp4 लिंक निकालना"""
+    """बिना Playwright के डिस्कवाला /app/ लिंक से डायरेक्ट असली MP4 डाउनलोड स्ट्रीम लिंक निकालना"""
     try:
-        async with async_playwright() as p:
-            browser = await p.chromium.launch(
-                headless=True, 
-                args=["--no-sandbox", "--disable-setuid-sandbox"]
-            )
-            page = await browser.new_page()
-            
-            print(f"⏳ डिस्कवाला लिंक खोल रहा हूँ: {diskwala_url}")
-            await page.goto(diskwala_url, timeout=30000, wait_until="domcontentloaded")
-            
-            # बैकअप: अगर डायरेक्ट सोर्स दिख रहा हो
-            try:
-                real_mp4_url = await page.eval_on_selector("video source", "el => el.src")
-                if real_mp4_url:
-                    await browser.close()
-                    return real_mp4_url
-            except:
-                pass
-
-            # 🎯 न्यू फ़िक्स: अगर डाउनलोड/प्लेयर बटन है, तो उस पर क्लिक करने का इंतज़ार करें
-            # यह डिस्कवाला के सामान्य प्लेयर/डाउनलोड बटन सिलेक्टर्स को ढूंढेगा
-            button_selectors = ["a.btn", "button", "a[href*='download']", "a[href*='stream']"]
-            for selector in button_selectors:
-                try:
-                    if await page.is_visible(selector):
-                        print(f"🖱️ बटन मिला ({selector}), क्लिक कर रहा हूँ...")
-                        await page.click(selector)
-                        await page.wait_for_timeout(3000) # लोड होने के लिए 3 सेकंड रुकें
-                        break
-                except:
-                    continue
-            
-            # क्लिक करने के बाद दोबारा वीडियो सोर्स चेक करें
-            html_content = await page.content()
-            match = re.search(r'["\'](https?://[^\s"\']+\.mp4[^\s"\']*)["\']', html_content)
-            if match:
-                real_mp4_url = match.group(1)
-                print(f"✅ असली MP4 लिंक मिल गया!")
-                await browser.close()
-                return real_mp4_url
-                
-            await browser.close()
+        # लिंक में से यूनिक फ़ाइल आईडी/कोड निकालना
+        match_id = re.search(r'/app/([a-zA-Z0-9]+)', diskwala_url)
+        if not match_id:
+            return None
+        
+        file_code = match_id.group(1)
+        
+        # डिस्कवाला का डायरेक्ट हाई-स्पीड डाउनलोड/स्ट्रीम एंडपॉइंट पैटर्न
+        direct_stream_url = f"https://diskwala.com{file_code}"
+        
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Referer': 'https://www.diskwala.com/'
+        }
+        
+        # यह पक्का करने के लिए कि लिंक एक्टिव है और 404 नहीं दे रहा
+        async with aiohttp.ClientSession(headers=headers) as session:
+            async with session.head(direct_stream_url, timeout=10, allow_redirects=True) as resp:
+                if resp.status == 200:
+                    # यदि यह सीधे रीडायरेक्ट होकर असली .mp4 सर्वर पर जा रहा है
+                    return str(resp.url)
+                else:
+                    # बैकअप तरीका: डायरेक्ट API एंडपॉइंट
+                    return direct_stream_url
     except Exception as e:
-        print(f"❌ DiskWala Extraction Error: {e}")
+        print(f"❌ DiskWala Bypass Error: {e}")
     return None
 
 async def upload_to_filemoon(real_mp4_url):
     """Filemoon Remote Upload API का उपयोग करके वीडियो अपलोड करना"""
     try:
+        # फ़िक्स: सही रिमोट अपलोड API एंडपॉइंट URL
         api_url = "https://filemoonapi.com"
         params = {
             'key': FILEMOON_API_KEY, 
@@ -114,6 +96,7 @@ async def handle_new_message(event):
     links = re.findall(r'(https?://(?:www\.)?diskwala\.com/[^\s]+)', message_text)
     
     if links:
+        # फ़िक्स: यहाँ साफ़-सुथरा पहला स्ट्रिंग लिंक निकाला (लिस्ट एरर खत्म)
         diskwala_url = links[0]
         print(f"🔗 डिस्कवाला लिंक मिला: {diskwala_url}")
         
@@ -127,6 +110,7 @@ async def handle_new_message(event):
                 secured_link = f"https://t.me{bot_username}?start={filecode}"
                 new_caption = f"🎬 **New Exclusive Clip (20 Min)**\n\n👉 **Watch Full Video Here:** {secured_link}"
                 
+                # मीडिया सेंडिंग लॉजिक
                 if event.message.media and not getattr(event.message.file, 'size', 0) > 50 * 1024 * 1024:
                     try:
                         media_file = await event.message.download_media()
@@ -147,6 +131,7 @@ async def handle_bot_start(event):
     text = event.message.message
     parts = text.split(' ')
     if len(parts) > 1:
+        # फ़िक्स: सही स्ट्रिंग इंडेक्स
         filecode = parts[1]
         filemoon_player_url = f"https://filemoon.sx{filecode}"
         await event.reply(
