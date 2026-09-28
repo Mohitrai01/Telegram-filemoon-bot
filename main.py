@@ -19,8 +19,8 @@ def run_web_server():
 
 # --- 2. टेलीग्राम और API कॉन्फ़िगरेशन ---
 # ⚠️ यहाँ अपनी असली डिटेल्स ध्यान से भरें:
-API_ID = 34278215         # my.telegram.org से लें (बिना कोट्स के)
-API_HASH = '82aafe1590473bdbc558f60c46ed3387' 
+API_ID =          # my.telegram.org से लें (बिना कोट्स के)
+API_HASH = '' 
 BOT_TOKEN = '8817454197:AAGdII5VzjvJfBHG2gQ6n0j6G3v0xNTKnU0' 
 FILEMOON_API_KEY = '110|4mK5RhaO8YzMQb2aXgmcDuPqXTUgxdrzysgz6kP3' 
 
