@@ -25,7 +25,7 @@ BOT_TOKEN = '8817454197:AAGdII5VzjvJfBHG2gQ6n0j6G3v0xNTKnU0'
 FILEMOON_API_KEY = '110|4mK5RhaO8YzMQb2aXgmcDuPqXTUgxdrzysgz6kP3' 
 
 # 🎯 आपकी नोटपैड वाली लंबी स्ट्रिंग को यहाँ ट्रिपल कोट्स में डालें:
-TELEGRAM_STRING_SESSION = """1BVtsOMABu0gry-tc2n1t6umsoPgW6zR_cHS1EE4QfRm2L1f4pVNSgkcNyFGh_l30YudtJU0qU80dTFZfXrHYnYWIZDnp5XvJFlTTchxFzUZ0xQ-vlgrL3FJNJw8YqBTYrRFnPK1e7ItEttBG8qc-D60-wXcATtLtxYQ4v2HqN9CYgYy6xDp89zqLp83KEoeQIth6Qnv9SMxc_glP6zEFE6Ur2-KfVgoJ9G5UuratDWGhfncLstYKeqbrF7Qd4NLsXlCk-a7EYDc6Q-3UZx278jA5aeMGKyjIdQ2uxqe0tG3l6W6Nd5REGZWrNCLjooWuJ2VkYR5ZP03kMNUGUSlvec5O2tN9B4M="""
+TELEGRAM_STRING_SESSION = """HMM"""
 
 # 🎯 रोज़ बॉट से निकाली हुई असली प्राइवेट चैनल आईडी यहाँ डालें (बिना कोट्स के)
 SOURCE_CHANNEL = -1004479525114  
